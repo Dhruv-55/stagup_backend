@@ -11,6 +11,11 @@ use App\Http\Controllers\HomeController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
+Route::get('login', function () {
+    return response()->json([
+        'redirect_url' => env('FRONTEND_URL')
+    ]);
+});
 
 
 Route::group([ 'prefix' => 'auth', 'controller' => AuthController::class ], function () {
