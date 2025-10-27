@@ -7,10 +7,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GenrealPurposeController;
 use App\Http\Controllers\Organizer\VenueController;
 use App\Http\Controllers\Organizer\EventController;
+use App\Http\Controllers\StoryController;
 use App\Http\Controllers\HomeController;
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+
 Route::get('login', function () {
     return response()->json([
         'redirect_url' => env('FRONTEND_URL')
@@ -67,4 +66,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group([ 'prefix' => 'home', 'controller' => HomeController::class ], function () {
         Route::get('/', 'index');
     });
+
+    Route::group([ 'prefix' => 'story', 'controller' => StoryController::class ], function () {
+        Route::post('add-or-update', 'addOrUpdate');
+        Route::get('load-stories', 'loadStories');
+    });
+
+    
 });
