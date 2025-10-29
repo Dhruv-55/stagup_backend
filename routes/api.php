@@ -9,6 +9,7 @@ use App\Http\Controllers\Organizer\VenueController;
 use App\Http\Controllers\Organizer\EventController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MessageController;
 
 Route::get('login', function () {
     return response()->json([
@@ -72,5 +73,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('load-stories', 'loadStories');
     });
 
-    
+   
+    Route::group([ 'prefix' => 'message', 'controller' => MessageController::class ], function () {
+        Route::get('search', 'search');
+    });
 });
