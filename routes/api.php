@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("explore",'explore');
     });   
     
-    
+
     Route::group([ 'prefix' => 'venue', 'controller' => VenueController::class ], function () {
         Route::get('/', 'venues');
         Route::post('add', 'venueAdd');
