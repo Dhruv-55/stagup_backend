@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('chat_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            // $table->foreignId('other_user_id');
+            $table->foreignId('other_user_id');
             $table->dateTime('start_at');
             $table->dateTime('end_at')->nullable();
             $table->string('status')->default('active');

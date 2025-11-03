@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
 use App\Models\Chat;
 use App\Models\ChatSession;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 class MessageController extends Controller
 {
     public function search(Request $request)
@@ -50,5 +52,88 @@ class MessageController extends Controller
         });
         
         return ResponseHelper::success($users);
+    }
+
+
+    public function loadUser(Request $request){
+        $user = User::with(["profile"])->where("id", $request->user_id)->first();
+        
+        // if(!$chat_session = ChatSession::where("user_id", $user->id)->orWhere("user_id", $request->user()->id)->first()){
+        //     $chat_session = ChatSession::create([
+        //         "user_id" => $user->id,
+        //         // "session_id" => Str::uuid()->toString(),
+        //         "start_at" => now()
+        //     ]);
+        // }
+
+
+         $chat_session = ChatSession::where(function ($query) use ($request, $user) {
+            $query->where('user_id', $request->user()->id)
+                ->where('other_user_id', $user->id);
+        })
+        ->orWhere(function ($query) use ($request, $user) {
+            $query->where('user_id', $user->id)
+                ->where('other_user_id', $request->user()->id);
+        })
+        ->first();
+
+        $chats = Chat::where("session_id", $chat_session->id)->orderBy("created_at", "desc")->get();
+
+        return ResponseHelper::success([
+            "user" => $user,
+            "chats" => $chats,
+            "chat_session" => $chat_session,
+        ]);
+    }
+
+
+    public function loadChats(Request $request){
+        // return $request->all();
+        $otherUserId = $request->other_user_id;
+        $chat_session = ChatSession::where(function ($query) use ($request, $otherUserId) {
+            $query->where('user_id', $request->user()->id)
+                ->where('other_user_id', $otherUserId);
+        })
+        ->orWhere(function ($query) use ($request, $otherUserId) {
+            $query->where('user_id', $otherUserId)
+                ->where('other_user_id', $request->user()->id);
+        })
+        ->first();
+
+        if(!$chat_session){
+            $chat_session = ChatSession::create([
+                "user_id" => $request->user()->id,
+                "other_user_id" => $otherUserId,
+                "start_at" => now()
+            ]);
+        }
+        $chats = Chat::where("session_id", $chat_session->id)->get();
+
+        return ResponseHelper::success([
+            "chats" => $chats,
+            "chat_session" => $chat_session,
+        ]);
+    }
+
+
+    public function sendMessage(Request $request){
+        $validator = Validator::make($request->all(), [
+            "session_id" => "required",
+            "message" => "required",
+            "user_id" => "required",
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseHelper::error($validator->errors()->first());
+        }
+
+        $chat = Chat::create([
+            "session_id" => $request->session_id,
+            "user_id" => $request->user_id,
+            "message" => $request->message,
+            "sender_type" => "user",
+        ]);
+
+        return ResponseHelper::success($chat);
     }
 }

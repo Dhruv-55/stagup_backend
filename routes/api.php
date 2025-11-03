@@ -76,5 +76,8 @@ Route::middleware('auth:sanctum')->group(function () {
    
     Route::group([ 'prefix' => 'message', 'controller' => MessageController::class ], function () {
         Route::get('search', 'search');
+        Route::get('load-user', 'loadUser');
+        Route::get('load-chats', 'loadChats');
+        Route::post('send', 'sendMessage');
     });
 });
