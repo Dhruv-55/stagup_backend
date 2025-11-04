@@ -42,10 +42,19 @@ class MessageController extends Controller
         }
 
         collect($users)->map(function ($user) use($request){
-            $last_chat_session = ChatSession::where("user_id", $user->id)->orWhere("user_id", $request->user()->id)->first();
+             $chat_session = ChatSession::where(function ($query) use ($request, $user) {
+                $query->where('user_id', $request->user()->id)
+                    ->where('other_user_id', $user->id);
+            })
+            ->orWhere(function ($query) use ($request, $user) {
+                $query->where('user_id', $user->id)
+                    ->where('other_user_id', $request->user()->id);
+            })
+            ->first();
+            // $last_chat_session = ChatSession::where("user_id", $user->id)->orWhere("user_id", $request->user()->id)->first();
             $last_message = null;
-            if($last_chat_session){
-                $last_message = Chat::where("session_id", $last_chat_session->id)->orderBy("created_at", "desc")->first();
+            if($chat_session){
+                $last_message = Chat::where("session_id", $chat_session->id)->orderBy("created_at", "desc")->first();
             }
             $user->last_message = $last_message;
             return $user;
