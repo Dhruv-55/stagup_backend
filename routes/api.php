@@ -17,7 +17,6 @@ Route::get('login', function () {
     ]);
 });
 
-
 Route::group([ 'prefix' => 'auth', 'controller' => AuthController::class ], function () {
     Route::get('username-exists', 'usernameExistsOrNot');
     Route::post('login', 'login');
