@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{User,UserFollow,UserProfile,Event};
+use App\Models\{User,UserFollow,UserProfile,Event,Story};
 use App\Helper\ResponseHelper;
 class ProfileController extends Controller
 {
@@ -63,6 +63,7 @@ class ProfileController extends Controller
         $user->followers = UserFollow::followerCount($user->id);
         $user->following = UserFollow::followingCount($user->id);
         $user->is_follow = $is_follow;
+        $user->today_story_posted = Story::where('user_id', $user->id)->whereDate('created_at', now()->toDateString())->exists();
         return ResponseHelper::success($user);
     }
 

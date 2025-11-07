@@ -86,7 +86,10 @@ class MessageController extends Controller
         })
         ->first();
 
-        $chats = Chat::where("session_id", $chat_session->id)->orderBy("created_at", "desc")->get();
+        $chats = [];
+        if($chat_session){
+            $chats = Chat::where("session_id", $chat_session->id)->orderBy("created_at", "desc")->get();
+        }
 
         return ResponseHelper::success([
             "user" => $user,
