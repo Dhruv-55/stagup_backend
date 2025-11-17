@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post("unfollow",'unfollowUser');
         Route::post("likeOrDislike",'likeOrDislike');
         Route::get("explore",'explore');
+        Route::get("peopleMightKnow",'peopleMightKnow');
     });   
     
 

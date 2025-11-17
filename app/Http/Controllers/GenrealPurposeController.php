@@ -91,4 +91,39 @@ class GenrealPurposeController extends Controller
             'has_more' => $events->hasMorePages()
         ]);
     }
+
+public function peopleMightKnow(Request $request)
+{
+    $location = $request->user_location;
+
+    $pin_code = $location['userLocation']['pin_code'] ?? null;
+    $city = $location['userLocation']['city'] ?? null;
+
+    // Step 1: Get IDs the user follows
+    $followedIds = UserFollow::where('follower_id', $request->user()->id)
+        ->pluck('following_id');
+
+    // Step 2: Get users not followed
+    $users = User::with('profile')
+        ->where('users.id', '!=', $request->user()->id)
+        ->when($followedIds->isNotEmpty(), function ($q) use ($followedIds) {
+            $q->whereNotIn('users.id', $followedIds);
+        })
+        ->leftJoin('user_locations', 'users.id', '=', 'user_locations.user_id')
+        ->select('users.*') 
+        ->orderByRaw("
+            CASE
+                WHEN user_locations.pin_code = ? THEN 1
+                WHEN user_locations.city = ? THEN 2
+                ELSE 3
+            END
+        ", [$pin_code, $city])
+        ->orderBy('users.created_at', 'desc')
+        ->limit(5)
+        ->get();
+
+    return ResponseHelper::success($users);
+}
+
+
 }
