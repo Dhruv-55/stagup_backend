@@ -24,6 +24,7 @@ class VenueFactory extends Factory
             'city' => $this->faker->city(),
             'state' => $this->faker->state(),
             'country' => 'India',
+            'pin_code' => $this->faker->regexify('[1-8][0-9]{5}'),
             'capacity' => $this->faker->numberBetween(50, 1000),
             'contact_email' => $this->faker->unique()->safeEmail(),
             'contact_phone' => $this->faker->phoneNumber(),

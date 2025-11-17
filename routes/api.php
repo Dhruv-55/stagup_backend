@@ -10,6 +10,7 @@ use App\Http\Controllers\Organizer\EventController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\UserLocationController;
 
 Route::get('login', function () {
     return response()->json([
@@ -78,5 +79,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('load-user', 'loadUser');
         Route::get('load-chats', 'loadChats');
         Route::post('send', 'sendMessage');
+    });
+
+    Route::group([ 'prefix' => 'user-location', 'controller' => UserLocationController::class ], function () {
+        Route::post('update-or-create', 'updateOrCreateLocation');
+        Route::get('is-today-location-updated', 'isTodayLocationUpdated');
     });
 });

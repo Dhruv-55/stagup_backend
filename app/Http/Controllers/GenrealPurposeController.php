@@ -67,10 +67,18 @@ class GenrealPurposeController extends Controller
     public function explore(Request $request){
         $perPage = $request->get('per_page', 30); 
         $page = $request->get('page', 1); 
+
+        $location = $request->user_location;
+
+        $pin_code = $location['userLocation']['pin_code'];
+        $city = $location['userLocation']['city'];
         
         // Option 1: Use orderBy instead of inRandomOrder for consistent pagination
         $events = Event::with('user.profile', 'venue')
-            ->orderBy('created_at', 'desc') // or 'id', 'desc'
+            ->leftJoin('venues', 'events.venue_id', '=', 'venues.id')
+            ->select('events.*')
+            ->orderByRaw("CASE WHEN venues.pin_code = ? THEN 1 WHEN venues.city = ? THEN 2 ELSE 3 END ASC", [$pin_code, $city])
+            ->orderBy('events.created_at', 'desc') // secondary sort
             ->paginate($perPage, ['*'], 'page', $page);
         
         return response()->json([

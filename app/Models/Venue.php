@@ -16,6 +16,7 @@ class Venue extends Model
         'city',
         'state',
         'country',
+        'pin_code',
         'capacity',
         'contact_email',
         'contact_phone',
