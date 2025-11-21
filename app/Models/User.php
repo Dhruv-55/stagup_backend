@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_type',
+        "fcm_token"
     ];
 
     /**
@@ -66,5 +67,10 @@ class User extends Authenticatable
     public function chatSessions()
     {
         return $this->hasMany(ChatSession::class);
+    }
+
+    public function userLocations()
+    {
+        return $this->hasMany(UserLocation::class);
     }
 }

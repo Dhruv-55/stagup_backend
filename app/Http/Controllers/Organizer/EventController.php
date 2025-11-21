@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Helper\ResponseHelper;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use App\Models\Venue;
+use App\Events\OpenMicEventNotiSent;
+
+
 class EventController extends Controller
 {
     public function events(Request $request)
@@ -53,6 +58,24 @@ class EventController extends Controller
             // 'max_participants' => $request->max_participants,
             'is_featured' => $request->is_featured,
         ]);
+        if($event){
+
+            $venue = Venue::select('pin_code', 'city')->find($event->venue_id);
+            $near_location_users = User::with('userLocations')->whereHas('userLocations', function($query) use ($event, $venue) {
+                $query->where('pin_code', $venue->pin_code)->orWhere('city', $venue->city);
+            })->get();
+         
+            foreach($near_location_users as $user){
+            event(new OpenMicEventNotiSent(
+                $user,
+                "New Update!",
+                "Your event starts soon."
+            ));
+            }
+            
+
+
+        }
         return ResponseHelper::success($event);
     }
 

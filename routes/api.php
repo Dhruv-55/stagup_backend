@@ -11,6 +11,8 @@ use App\Http\Controllers\StoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\UserLocationController;
+use App\Http\Controllers\NotificationController;
+
 
 Route::get('login', function () {
     return response()->json([
@@ -86,4 +88,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update-or-create', 'updateOrCreateLocation');
         Route::get('is-today-location-updated', 'isTodayLocationUpdated');
     });
+
+    
+    Route::group([ 'prefix' => 'notification', 'controller' => NotificationController::class ], function () {
+        Route::post('save-fcm-token', 'saveToken');
+        // Route::post('send', 'sendNotification');
+    });
 });
+
+Route::post('/notification/send', [NotificationController::class, 'sendNotification']);
